@@ -21,11 +21,24 @@ static NSString * const XcodeCompatibilityVersionString = @"Xcode 3.2";
 
 @implementation BuildSettingExtractor
 
++ (NSString *)defaultSharedConfigName {
+    return @"Shared";
+}
+
++ (NSString *)defaultProjectConfigName {
+    return @"Project";
+}
+
++ (NSString *)defaultNameSeparator {
+    return @"-";
+}
+
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _sharedConfigName = @"Shared";
-        _projectConfigName = @"Project";
+        _sharedConfigName = [[self class] defaultSharedConfigName];
+        _projectConfigName = [[self class] defaultProjectConfigName];
+        _nameSeparator = [[self class] defaultNameSeparator];
         _buildSettingsByTarget = [[NSMutableDictionary alloc] init];
         _buildSettingInfoSource = [[BuildSettingInfoSource alloc] init];
     }
@@ -150,7 +163,8 @@ static NSString * const XcodeCompatibilityVersionString = @"Xcode 3.2";
 
 // Given the target name and config name returns the xcconfig filename to be used.
 - (NSString *)configFilenameWithTargetName:(NSString *)targetName configName:(NSString *)configName {
-    return [NSString stringWithFormat:@"%@-%@.xcconfig", targetName, configName];
+    NSString *separator = configName.length ? self.nameSeparator: @"";
+    return [NSString stringWithFormat:@"%@%@%@.xcconfig", targetName, separator, configName];
 }
 
 // Given the filename generate the header comment
@@ -192,10 +206,10 @@ static NSString * const XcodeCompatibilityVersionString = @"Xcode 3.2";
         }
 
         if ([value isKindOfClass:[NSString class]]) {
-            [string appendFormat:@"%@ = %@\r", key, value];
+            [string appendFormat:@"%@ = %@\n", key, value];
 
         } else if ([value isKindOfClass:[NSArray class]]) {
-            [string appendFormat:@"%@ = %@\r", key, [value componentsJoinedByString:@" "]];
+            [string appendFormat:@"%@ = %@\n", key, [value componentsJoinedByString:@" "]];
         } else {
             [NSException raise:@"Should not get here!" format:@"Unexpected class: %@ in %s", [value class], __PRETTY_FUNCTION__];
         }

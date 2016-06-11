@@ -51,6 +51,33 @@ These comments can be turned off in the Preferences sheet for a more compact fil
 
 ###Version History###
 
+*Version 1.2.3*  
+*Nov 9, 2015*
+  
+– Updated list of build setting description files to include new LLDB 7.0 file.  
+– No longer inexplicably using return instead of newline character in two spots.
+
+*Version 1.2.2*  
+*May 25, 2015*
+
+– Added brand new app icon.  
+– Removed default Credits.rtf file.
+
+*Version 1.2.1*  
+*May 16, 2015*
+
+– Updated list of build setting description files to include new LLDB 6.1 file.
+
+*Version 1.2*  
+*May 16, 2015*
+
+– Added options for generated file names in Preferences. (Thank you [Alex Curylo](https://github.com/alexcurylo)!)
+
+*Version 1.1.1*  
+*May 12, 2015*
+
+– Fixed crash on Mavericks.  
+
 *Version 1.1*  
 *February 7, 2015*
 

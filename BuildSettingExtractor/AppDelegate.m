@@ -58,8 +58,14 @@
                 NSURL *destinationURL = openPanel.URL;
 
                 // Perform the extraction in the background.
-                dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+                // Using DISPATCH_QUEUE_PRIORITY_HIGH which is available on 10.9
+                // Move to QOS_CLASS_USER_INITIATED when 10.10 is the deployment target
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
                     BuildSettingExtractor *buildSettingExtractor = [[BuildSettingExtractor alloc] init];
+                    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                    buildSettingExtractor.sharedConfigName = [defaults stringForKey:TPSOutputFileNameShared];
+                    buildSettingExtractor.projectConfigName = [defaults stringForKey:TPSOutputFileNameProject];
+                    buildSettingExtractor.nameSeparator = [defaults stringForKey:TPSOutputFileNameSeparator];
                     buildSettingExtractor.includeBuildSettingInfoComments = [[NSUserDefaults standardUserDefaults] boolForKey:TPSIncludeBuildSettingInfoComments];
 
                     [buildSettingExtractor extractBuildSettingsFromProject:fileURL toDestinationFolder:destinationURL];
@@ -79,6 +85,9 @@
 }
 
 - (IBAction)dismissPreferencesWindow:(id)sender {
+    // make sure current edit field gets bound
+    [self.preferencesWindow makeFirstResponder:nil];
+    
     [self.window endSheet:self.preferencesWindow];
 }
 
@@ -142,7 +151,13 @@
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
-    NSDictionary *defaults = @{TPSOpenDirectoryInFinder:@(YES), TPSIncludeBuildSettingInfoComments:@(YES)};
+    NSDictionary *defaults = @{
+        TPSOpenDirectoryInFinder:@(YES),
+        TPSIncludeBuildSettingInfoComments:@(YES),
+        TPSOutputFileNameShared:BuildSettingExtractor.defaultSharedConfigName,
+        TPSOutputFileNameProject:BuildSettingExtractor.defaultProjectConfigName,
+        TPSOutputFileNameSeparator:BuildSettingExtractor.defaultNameSeparator,
+    };
     [[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 }
 
